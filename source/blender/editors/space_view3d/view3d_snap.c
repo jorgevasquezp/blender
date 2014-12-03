@@ -20,7 +20,8 @@
  *
  * The Original Code is: all of this file.
  *
- * Contributor(s): none yet.
+ * Contributor(s): 
+ *		Jorge Vasquez
  *
  * ***** END GPL LICENSE BLOCK *****
  */
@@ -217,6 +218,11 @@ static int snap_sel_to_curs_exec(bContext *C, wmOperator *op)
 	int a;
 
 	const bool use_offset = RNA_boolean_get(op->ptr, "use_offset");
+	
+	const bool snap_x = RNA_boolean_get(op->ptr, "snap_x");
+	const bool snap_y = RNA_boolean_get(op->ptr, "snap_y");
+	const bool snap_z = RNA_boolean_get(op->ptr, "snap_z");
+	
 
 	cursor_global = ED_view3d_cursor3d_get(scene, v3d);
 
@@ -292,11 +298,11 @@ static int snap_sel_to_curs_exec(bContext *C, wmOperator *op)
 								}
 
 								/* copy new position */
-								if ((pchan->protectflag & OB_LOCK_LOCX) == 0)
+								if (((pchan->protectflag & OB_LOCK_LOCX) == 0) & snap_x )
 									pchan->loc[0] = cursor_pose[0];
-								if ((pchan->protectflag & OB_LOCK_LOCY) == 0)
+								if (((pchan->protectflag & OB_LOCK_LOCY) == 0) & snap_y )
 									pchan->loc[1] = cursor_pose[1];
-								if ((pchan->protectflag & OB_LOCK_LOCZ) == 0)
+								if (((pchan->protectflag & OB_LOCK_LOCZ) == 0) & snap_z )
 									pchan->loc[2] = cursor_pose[2];
 
 								/* auto-keyframing */
@@ -331,11 +337,11 @@ static int snap_sel_to_curs_exec(bContext *C, wmOperator *op)
 					invert_m3_m3(imat, originmat);
 					mul_m3_v3(imat, cursor_parent);
 				}
-				if ((ob->protectflag & OB_LOCK_LOCX) == 0)
+				if (((ob->protectflag & OB_LOCK_LOCX) == 0) & snap_x )
 					ob->loc[0] += cursor_parent[0];
-				if ((ob->protectflag & OB_LOCK_LOCY) == 0)
+				if (((ob->protectflag & OB_LOCK_LOCY) == 0) & snap_y )
 					ob->loc[1] += cursor_parent[1];
-				if ((ob->protectflag & OB_LOCK_LOCZ) == 0)
+				if (((ob->protectflag & OB_LOCK_LOCZ) == 0) & snap_z )
 					ob->loc[2] += cursor_parent[2];
 
 				/* auto-keyframing */
@@ -368,6 +374,11 @@ void VIEW3D_OT_snap_selected_to_cursor(wmOperatorType *ot)
 
 	/* rna */
 	RNA_def_boolean(ot->srna, "use_offset", 1, "Offset", "");
+	
+	//for snapping on specific axis
+	RNA_def_boolean(ot->srna, "snap_x", 1, "Snap X-Axis", "Snap on X axis");
+	RNA_def_boolean(ot->srna, "snap_y", 1, "Snap Y-Axis", "Snap on Y axis");
+	RNA_def_boolean(ot->srna, "snap_z", 1, "Snap Z-Axis", "Snap on Z axis");
 }
 
 /* *************************************************** */
